@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
 
 import static io.cucumber.core.exception.ExceptionUtils.printStackTrace;
 import static io.cucumber.core.plugin.Formats.ansi;
@@ -194,6 +195,10 @@ public final class PrettyFormatter implements ConcurrentEventListener, ColorAwar
         try (BufferedReader lines = new BufferedReader(new StringReader(event.getText()))) {
             String line;
             while ((line = lines.readLine()) != null) {
+                if (formats instanceof Formats.Ansi) {
+                    Matcher m = Patterns.WEB_URL.matcher(line);
+                    line = m.replaceAll("\033]8;;$1\033\\\\$1\033]8;;\033\\\\");
+                }
                 builder.append(STEP_SCENARIO_INDENT)
                         .append(line)
                         // Add system line separator - \n won't do it!
